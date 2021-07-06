@@ -19,5 +19,5 @@ IndiKart is an e-commerce progressive web application having a 2 primary modules
 `password` : LO:a0|!_
 
 ### Live Demo 
-
+https://indikart.herokuapp.com/
 
