@@ -70,7 +70,7 @@ const RegisterScreen = ({ location, history }) => {
             type='input'
             placeholder='Enter Number'
             value={Number}
-            // pattern="[0-9]{10}"
+            pattern="[0-9]{10}"
             onChange={(e) => setNumber(e.target.value)}
           ></Form.Control>
         </Form.Group>
