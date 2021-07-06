@@ -67,7 +67,7 @@ const RegisterScreen = ({ location, history }) => {
         <Form.Group controlId='number'>
           <Form.Label>Mobile Number</Form.Label>
           <Form.Control
-            type='number'
+            type='input'
             placeholder='Enter Number'
             value={Number}
             // pattern="[0-9]{10}"

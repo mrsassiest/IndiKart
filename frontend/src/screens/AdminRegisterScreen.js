@@ -67,9 +67,10 @@ const AdminRegisterScreen = ({ location, history }) => {
         <Form.Group controlId='number'>
           <Form.Label>Mobile Number</Form.Label>
           <Form.Control
-            type='number'
-            placeholder='Enter number'
+            type='input'
+            placeholder='Enter Number'
             value={Number}
+            pattern="[0-9]{10}"
             onChange={(e) => setNumber(e.target.value)}
           ></Form.Control>
         </Form.Group>
