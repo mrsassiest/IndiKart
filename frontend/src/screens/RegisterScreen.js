@@ -6,17 +6,18 @@ import Message from '../components/Message'
 import Loader from '../components/Loader'
 import FormContainer from '../components/FormContainer'
 import { register } from '../actions/userActions'
+import firebase from './../firebase1'
 
 const RegisterScreen = ({ location, history }) => {
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
-  const [Number, setNumber] = useState('')
+  const [number, setNumber] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [message, setMessage] = useState(null)
 
   const dispatch = useDispatch()
-
+  const phone=""
   const userRegister = useSelector((state) => state.userRegister)
   const { loading, error, userInfo } = userRegister
 
@@ -33,10 +34,72 @@ const RegisterScreen = ({ location, history }) => {
     if (password !== confirmPassword) {
       setMessage('Passwords do not match')
     } else {
-      dispatch(register(name, email, Number, password))
+      dispatch(register(name, email, number, password))
     }
   }
+  const configureCaptcha = () => {
+    console.log("Digvijay")
+    window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier(
+      "sign-in-button",
+      {
+        size: "invisible",
+        callback: (response) => {
+          // reCAPTCHA solved, allow signInWithPhoneNumber.
+          this.onSignInSubmit();
+          console.log("Recaptca varified");
+        },
+        defaultCountry: "IN",
+      }
+    );
+  };
 
+  const onSubmitOTP = (e) => {
+    e.preventDefault();
+    const code = document.getElementById("otp").value;
+    console.log(code);
+    window.confirmationResult
+      .confirm(code)
+      .then((result) => {
+        const user = result.user;
+        console.log(JSON.stringify(user));
+        alert("User is verified");
+        this.setState({ isVerified: true });
+        // ...
+      })
+      .catch((error) => {
+        // User couldn't sign in (bad verification code?)
+        // ...
+      });
+  };
+  const handleSendOtp=(e)=> {
+    e.preventDefault();
+    const p = document.getElementById("phone").value;
+    if (p.length !== 10) {
+      alert("Invalid Phone Number");
+      return;
+    }
+    console.log("MAnish")
+    configureCaptcha();
+    const phoneNumber = "+91" + p;
+    console.log(phoneNumber);
+    const appVerifier = window.recaptchaVerifier;
+    
+    firebase
+      .auth()
+      .signInWithPhoneNumber(phoneNumber, appVerifier)
+      .then((confirmationResult) => {
+        window.confirmationResult = confirmationResult;
+        console.log("OTP has been sent");
+        alert("OTP Sent");
+        this.setState({ showOtpPanel: true });
+        // ...
+      })
+      .catch((error) => {
+        // Error; SMS not sent
+        // ...
+        alert("SMS not sent!!Please try after some time");
+      });
+  }     
   return (
     <FormContainer>
       <h1>Sign up as User</h1>
@@ -65,16 +128,29 @@ const RegisterScreen = ({ location, history }) => {
         </Form.Group>
 
         <Form.Group controlId='number'>
+          <div id="sign-in-button"></div>
           <Form.Label>Mobile Number</Form.Label>
           <Form.Control
             type='input'
+            name="phone"
+            id="phone"
             placeholder='Enter Number'
-            value={Number}
+            value={number}
             pattern="[0-9]{10}"
             onChange={(e) => setNumber(e.target.value)}
           ></Form.Control>
+          <Button onClick={handleSendOtp}>Send OTP</Button>
         </Form.Group>
-
+        <Form.Group controlId='number'>
+          <Form.Label>Enter OTP</Form.Label>
+          <Form.Control
+            type='input'
+            name="otp"
+            id="otp"
+            placeholder='Enter Number'
+          ></Form.Control>
+          <Button onClick={onSubmitOTP}>Verify OTP</Button>
+        </Form.Group>
         <Form.Group controlId='password'>
           <Form.Label>Password</Form.Label>
           <Form.Control
