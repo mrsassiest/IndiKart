@@ -68,24 +68,8 @@ export default function Resister(props) {
 
   return (
     <React.Fragment>
-      <Grid style={{ marginTop: '-4%' }}>
-        <AppBar className={classes.appbar} color="#ffffff" position="static">
-          <Tabs value={value}
-            onChange={handleChange} aria-label="simple tabs example">
-            <Tab label="Admin" {...a11yProps(0)} />
-            <Tab label="User" {...a11yProps(1)} />
-          </Tabs>
-        </AppBar>
-        <TabPanel value={value} index={0}>
-          <Grid style={{ paddingTop: '1%' }}>
-            <AdminRegisterScreen/>
-          </Grid>
-        </TabPanel>
-        <TabPanel value={value} index={1}>
-          <Grid style={{ paddingTop: '3%' }}>
-            <RegisterScreen />
-          </Grid>
-        </TabPanel>
+      <Grid >
+      <RegisterScreen />
       </Grid>
     </React.Fragment>
   )

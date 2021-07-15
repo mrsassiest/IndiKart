@@ -7,6 +7,7 @@ import Loader from '../components/Loader'
 import FormContainer from '../components/FormContainer'
 import { register } from '../actions/userActions'
 import firebase from './../firebase1'
+import swal from 'sweetalert';
 
 const RegisterScreen = ({ location, history }) => {
   const [name, setName] = useState('')
@@ -15,19 +16,20 @@ const RegisterScreen = ({ location, history }) => {
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [message, setMessage] = useState(null)
+  const [otpFlag,setOtpFlag] = useState(false)
 
   const dispatch = useDispatch()
   const phone=""
   const userRegister = useSelector((state) => state.userRegister)
   const { loading, error, userInfo } = userRegister
+  console.log("location",location)
+  const redirect = location.search ? location.search.split('=')[1] : '/'
 
-  // const redirect = location.search ? location.search.split('=')[1] : '/'
-
-  // useEffect(() => {
-  //   if (userInfo) {
-  //     history.push(redirect)
-  //   }
-  // }, [history, userInfo, redirect])
+  useEffect(() => {
+    if (userInfo) {
+      history.push(redirect)
+    }
+  }, [history, userInfo, redirect])
 
   const submitHandler = (e) => {
     e.preventDefault()
@@ -62,7 +64,11 @@ const RegisterScreen = ({ location, history }) => {
       .then((result) => {
         const user = result.user;
         console.log(JSON.stringify(user));
-        alert("User is verified");
+        swal("OTP verified", "", "success", {
+          timer: 2000,
+          buttons: false,
+        });
+        setOtpFlag(false)
         this.setState({ isVerified: true });
         // ...
       })
@@ -75,10 +81,13 @@ const RegisterScreen = ({ location, history }) => {
     e.preventDefault();
     const p = document.getElementById("phone").value;
     if (p.length !== 10) {
-      alert("Invalid Phone Number");
+      swal("Invalid Phone number", "Plaese enter a valid phone number", "warning", {
+          timer: 2000,
+          buttons: false,
+        });
       return;
     }
-    console.log("MAnish")
+    setOtpFlag(true)
     configureCaptcha();
     const phoneNumber = "+91" + p;
     console.log(phoneNumber);
@@ -89,8 +98,10 @@ const RegisterScreen = ({ location, history }) => {
       .signInWithPhoneNumber(phoneNumber, appVerifier)
       .then((confirmationResult) => {
         window.confirmationResult = confirmationResult;
-        console.log("OTP has been sent");
-        alert("OTP Sent");
+        swal("OTP sent", "Please Check your phone", "success", {
+          timer: 2000,
+          buttons: false,
+        });
         this.setState({ showOtpPanel: true });
         // ...
       })
@@ -141,16 +152,21 @@ const RegisterScreen = ({ location, history }) => {
           ></Form.Control>
           <Button onClick={handleSendOtp}>Send OTP</Button>
         </Form.Group>
-        <Form.Group controlId='number'>
-          <Form.Label>Enter OTP</Form.Label>
-          <Form.Control
-            type='input'
-            name="otp"
-            id="otp"
-            placeholder='Enter Number'
-          ></Form.Control>
-          <Button onClick={onSubmitOTP}>Verify OTP</Button>
-        </Form.Group>
+        {
+            otpFlag === true ? 
+            <Form.Group controlId='number'>
+         
+            <Form.Label>Enter OTP</Form.Label>
+            <Form.Control
+              type='input'
+              name="otp"
+              id="otp"
+              placeholder='Enter Number'
+            ></Form.Control>
+            <Button onClick={onSubmitOTP}>Verify OTP</Button>
+          </Form.Group> : null
+          }
+       
         <Form.Group controlId='password'>
           <Form.Label>Password</Form.Label>
           <Form.Control
@@ -176,14 +192,14 @@ const RegisterScreen = ({ location, history }) => {
         </Button>
       </Form>
 
-      {/* <Row className='py-3'>
+      <Row className='py-3'>
         <Col>
           Have an Account?{' '}
           <Link to={redirect ? `/login?redirect=${redirect}` : '/login'}>
             Login
           </Link>
         </Col>
-      </Row> */}
+      </Row>
     </FormContainer>
   )
 }
